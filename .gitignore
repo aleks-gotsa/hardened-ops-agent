@@ -1,0 +1,18 @@
+# secrets and local runtime
+.env
+docker-compose.yml
+backups/
+custom/
+redteam/data/
+redteam/.*_since
+*.log
+node_modules/
+.DS_Store
+
+# private working notes: not part of the public project
+CLAUDE.local.md
+*.local.md
+.claude/
+WRITEUP_NOTES.md
+docs/STATE.md
+docs/DECISIONS.md

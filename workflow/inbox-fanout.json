@@ -1,0 +1,173 @@
+{
+  "name": "hardened-ops-agent: inbox fan-out",
+  "nodes": [
+    {
+      "id": "8f92e957-8566-4f12-a6e5-3465427018b6",
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": ""
+        },
+        "options": {
+          "dataPropertyAttachmentsPrefixName": "attachment_",
+          "downloadAttachments": true
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_ME",
+          "name": "gmailOAuth2 (your credential)"
+        }
+      }
+    },
+    {
+      "id": "a11cb086-f311-4e0d-a426-496d5e8ca995",
+      "name": "One email at a time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "42a44815-c4a8-4aab-8bf4-59bf2616fb49",
+      "name": "Run agent workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        880,
+        80
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "MAIN_WORKFLOW_ID"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "8522eb3d-d599-4d20-8dfe-d6b12096c83e",
+      "name": "Auth headers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "position": [
+        440,
+        -80
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://gmail.googleapis.com/gmail/v1/users/me/messages/{{ $json.id }}?format=metadata&metadataHeaders=Authentication-Results",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_ME",
+          "name": "gmailOAuth2 (your credential)"
+        }
+      }
+    },
+    {
+      "id": "d5b6920e-628a-4bad-9287-884c66896961",
+      "name": "Attach auth result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -80
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Gmail's own verdict is the first Authentication-Results header with authserv-id mx.google.com.\n// Missing (API error, no header) → null → Normalize treats the sender as unauthenticated (fail-closed).\nconst src = $('One email at a time').item;\nconst headers = $json.payload?.headers || [];\nconst first = headers.find(h => /^authentication-results$/i.test(h.name) && /^\\s*mx\\.google\\.com\\b/i.test(h.value));\nreturn { json: { ...src.json, gmail_auth_results: first ? first.value : null }, binary: src.binary };"
+      }
+    }
+  ],
+  "connections": {
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "One email at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One email at a time": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Auth headers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run agent workflow": {
+      "main": [
+        [
+          {
+            "node": "One email at a time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auth headers": {
+      "main": [
+        [
+          {
+            "node": "Attach auth result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach auth result": {
+      "main": [
+        [
+          {
+            "node": "Run agent workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
