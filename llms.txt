@@ -1,0 +1,26 @@
+# Hardened Ops Agent
+
+> An n8n email agent for production inboxes, hardened against prompt injection. It reads incoming Gmail and does one of four things: opens a GitHub ticket, drafts a reply that a person approves in Telegram, escalates to a person, or quarantines the email. An email cannot make it send, leak or forward anything. Every decision is logged in PostgreSQL. It is red-teamed against Microsoft's LLMail-Inject corpus: 0 of 100 attacks executed, and 0 of 100 ordinary emails quarantined.
+
+Built with n8n (queue mode), Claude Haiku (guard and judge), Claude Sonnet (agent), the Document Guard static scanner node, PostgreSQL and Telegram. MIT license. The project is a workflow you import into your own n8n; it is not a hosted service.
+
+## Docs
+
+- [README](README.md): what it is, how it works, results, quick start
+- [Setup](docs/SETUP.md): requirements, credentials, placeholders, step-by-step install
+- [AGENTS.md](AGENTS.md): instructions for an AI agent asked to install or verify this project
+- [Red-team report](docs/REDTEAM.md): method, sample, per-layer results, run files, how to reproduce
+- [Hardening log](docs/HARDENING.md): weaknesses found, evidence, fixes
+- [Limitations](docs/LIMITATIONS.md): what the results do not cover yet
+
+## Files
+
+- [workflow/hardened-ops-agent.json](workflow/hardened-ops-agent.json): the main workflow, with eight checkpoints (canonicalize, claim and pre-filter, static guard, LLM guard, agent, output filter, judge, human approval)
+- [workflow/inbox-fanout.json](workflow/inbox-fanout.json): polls Gmail and starts one run of the main workflow per email
+- [workflow/schema.sql](workflow/schema.sql): the `agent_runs` audit table
+- [redteam/](redteam/): seeded sample, runner, four regression checks, report query, run results (`npm run attack`, `npm run checks`)
+
+## Optional
+
+- [LLMail-Inject](https://github.com/microsoft/llmail-inject-challenge): the public attack corpus used for testing
+- [n8n docs](https://docs.n8n.io/): installing and running n8n
