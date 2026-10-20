@@ -1,0 +1,15 @@
+{
+  "name": "hardened-ops-agent-redteam",
+  "private": true,
+  "description": "Red-team runner and regression checks for Hardened Ops Agent. No dependencies; Node 20.6+.",
+  "engines": { "node": ">=20.6" },
+  "scripts": {
+    "sample": "node sample.js",
+    "attack": "node --env-file=.env run.js",
+    "check:custom": "node --env-file=.env checks/custom-attacks.js",
+    "check:audit": "node --env-file=.env checks/audit-under-load.js --alerts",
+    "check:duplicate": "node --env-file=.env checks/no-duplicate-reply.js",
+    "check:payment": "node --env-file=.env checks/no-payment-data.js",
+    "checks": "npm run check:custom && npm run check:audit && npm run check:duplicate && npm run check:payment"
+  }
+}
