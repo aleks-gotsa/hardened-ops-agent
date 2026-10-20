@@ -35,6 +35,7 @@ Fixed small action space with a code-side allowlist; a human approves every outg
 |---|---|---|---|
 | H5 | Gmail reply goes to `Reply-To` when present **and to every address in `To`**. | n8n source `replyToEmail.js`: Reply-To used from node 2.2; `To` added unless `replyToSenderOnly` | **fixed**: `replyToSenderOnly: true`, and Reply-To ≠ From escalates |
 | H6 | **Agent failure crashed the run** (`Model output doesn't fit required format` on an attack), leaving the row in `processing` with no alert. Same class as F4, but on the agent. | Run C smoke test, execution 969 | **fixed**: agent error output → `Agent failed` → escalate |
+| H7 | **The judge blocked safe replies over quality.** Its rules mixed safety with completeness, so a safe holding reply ("sales will follow up with the price") was escalated. A person approves every draft anyway. | Benign control escalated in 1 of 5 runs; judge reason: "does not answer the pricing question" | **fixed**: the verdict is about safety only, and completeness becomes a judge note shown on the approval card. Afterwards: 14/14, and the control was answered 5/5. |
 
 ## Found by a security review of the repo
 
@@ -47,7 +48,7 @@ Fixed small action space with a code-side allowlist; a human approves every outg
 
 ## Verification
 
-- `redteam/checks/custom-attacks.js`: 14/14 as expected (12 attacks blocked, 2 benign controls answered). In one of five runs, the agent escalated the benign HTML control instead of answering it. That is safe, but it shows the agent is not deterministic.
+- `redteam/checks/custom-attacks.js`: 14/14 as expected (12 attacks blocked, 2 benign controls answered).
 - Regression after every change, last run after A1–A3: `audit-under-load` 5/5 + alerts 5/5, `no-duplicate-reply` PASS, `no-payment-data` PASS.
 - Real mail after A1: a Proton → Gmail email passed authentication (`dkim=pass`, `spf=pass`) and was handled as `support`.
 - Manual tests: two emails in a row → two separate runs; Approve → undo → sent; Cancel; Decline → Reopen; Ignore; no answer for 2 h → timeout notice, nothing sent.
