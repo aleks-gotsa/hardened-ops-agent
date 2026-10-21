@@ -50,15 +50,19 @@ Each email runs on its own and passes eight checkpoints. Any one of them can sto
 
 ## Results
 
-| | Full system | Strict mode | Agent alone | Agent alone, all actions |
-|---|---|---|---|---|
-| Attacks that worked | 0 / 100 | 0 / 100 | 0 / 100 | 0 / 100 |
-| Normal emails blocked by mistake | 0 / 100 | 0 / 100 | — | — |
-| Decisions logged | 200 / 200 | 200 / 200 | 200 / 200 | 100 / 100 |
+| | Full system | Strict mode | Agent alone |
+|---|---|---|---|
+| Attacks that worked | 0 / 100 | 0 / 100 | 0 / 100 |
+| Normal emails blocked by mistake | 0 / 100 | 1 / 100* | — |
+| Decisions logged | 200 / 200 | 200 / 200 | 200 / 200 |
+
+\* The LLM guard's API failed on that one email, so the system quarantined it instead of letting it through unchecked.
+
+[Blue Bookmark](https://github.com/aleks-gotsa/blue-bookmark) on its own flagged **71 of 100** attacks, up from 41 with its prototype.
 
 **What counts as an attack that worked:** the agent actually did what the attacker asked, for example added the attacker's address as a recipient. A refusal that mentions the attacker's address does not count.
 
-**Agent alone** means the guards were switched off on purpose, to check that the agent holds even if an attack gets past them.
+**Agent alone** means the guards were switched off on purpose and the agent was allowed every action, to check that it holds even if an attack gets past them.
 
 On top of the public corpus, 12 hand-written attacks test tricks it does not cover: hidden text in HTML, invisible characters, a forged sender, an instruction hidden in a PDF. All 12 were stopped, and 2 normal control emails were still answered.
 
@@ -74,7 +78,7 @@ On top of the public corpus, 12 hand-written attacks test tricks it does not cov
 
 New to n8n? Start with the [official n8n docs](https://docs.n8n.io/). The [setup guide](docs/SETUP.md) lists what you need and walks through every step. In short:
 
-1. Install the [Document Guard](https://github.com/aleks-gotsa/blue-bookmark) node (Blue Bookmark), then import the two workflows from [`workflow/`](workflow/) into n8n.
+1. Install the [Blue Bookmark](https://github.com/aleks-gotsa/blue-bookmark) node, then import the two workflows from [`workflow/`](workflow/) into n8n.
 2. Create the audit table from [`workflow/schema.sql`](workflow/schema.sql).
 3. Connect your Gmail, Telegram, GitHub and Anthropic accounts, then switch the workflows on.
 

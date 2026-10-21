@@ -4,7 +4,7 @@ docker-compose.yml
 backups/
 custom/
 redteam/data/
-redteam/.*_since
+redteam/.*_since*
 *.log
 node_modules/
 .DS_Store

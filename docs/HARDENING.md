@@ -15,7 +15,7 @@ Sources: a web review of known weak spots in LLM email agents, plus findings fro
 
 | # | Weakness | Applies here because | Fix | Effort | Source | Status |
 |---|---|---|---|---|---|---|
-| R1 | Each layer reads a different version of the email (hidden HTML, Unicode Tags, zero-width, bidi) | Haiku missed `display:none` (F2); Sonnet reads `body_text` | One `Canonicalize` node: visible text from the HTML, NFKC, strip invisible ranges, count what was stripped, then the same view goes to DG, Haiku and Sonnet. Hidden content raises the score. | S | embracethered.com (Unicode tags) | **fixed** |
+| R1 | Each layer reads a different version of the email (hidden HTML, Unicode Tags, zero-width, bidi) | Haiku missed `display:none` (F2); Sonnet reads `body_text` | One `Canonicalize` node: visible text from the HTML, NFKC, strip invisible ranges, count what was stripped, then the same view goes to Blue Bookmark, Haiku and Sonnet. Hidden content raises the score. | S | embracethered.com (Unicode tags) | **fixed** |
 | R2 | The reply goes to the attacker, so it is an exfiltration and phishing channel | `reply_text` goes back to the sender | Deterministic output filter: no URLs outside an allowlist, no foreign phone numbers or emails, length cap, a canary string from the system prompt | S | arXiv 2506.08837 | **fixed** |
 | R3 | Sender not authenticated; Reply-To can redirect | Gmail reply target not verified | Parse `Authentication-Results`: DMARC/SPF/DKIM fail → escalate. Reply-To ≠ From → escalate. | S | RFC 3834, Google DMARC docs | **fixed** (+ `replyToSenderOnly`) |
 | R4 | Ticket body is attacker text (GitHub injection, @mentions, images) | `args.title/body` come from the LLM | Fence the body as code, strip `@` and images; labels set by code | S | invariantlabs.ai | **fixed** |
@@ -50,5 +50,6 @@ Fixed small action space with a code-side allowlist; a human approves every outg
 
 - `redteam/checks/custom-attacks.js`: 14/14 as expected (12 attacks blocked, 2 benign controls answered).
 - Regression after every change, last run after A1–A3: `audit-under-load` 5/5 + alerts 5/5, `no-duplicate-reply` PASS, `no-payment-data` PASS.
+- After replacing the Document Guard prototype with Blue Bookmark v1 (21 Oct): custom set 14/14, regressions PASS, then the full red-team re-run in [REDTEAM.md](REDTEAM.md).
 - Real mail after A1: a Proton → Gmail email passed authentication (`dkim=pass`, `spf=pass`) and was handled as `support`.
 - Manual tests: two emails in a row → two separate runs; Approve → undo → sent; Cancel; Decline → Reopen; Ignore; no answer for 2 h → timeout notice, nothing sent.

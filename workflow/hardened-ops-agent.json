@@ -49,7 +49,7 @@
         16
       ],
       "parameters": {
-        "jsCode": "const src = $('Document Guard').item.json;\nconst g = $input.item.json.output || {};\n// `x` holds in-flight views; it is not an audit column\nconst { dg, x, ...base } = src;\n\n// Fail closed: the email passes Document Guard only if the scan returned a numeric score below 70\n// and did not report a scan error. A missing guard, a null score or verdict \"error\" all block.\nconst dgScore = typeof dg?.score === 'number' && Number.isFinite(dg.score) ? dg.score : null;\nconst dgClean = dgScore !== null && dgScore < 70 && dg?.verdict !== 'error';\nconst pre = (x?.flags || []).join(', ');\n\nreturn { json: {\n  ...base,\n  // a missing or non-numeric score is treated as maximum risk (fail-closed)\n  risk: Number.isFinite(Number(g.injection_risk)) && g.injection_risk !== null ? Number(g.injection_risk) : 1,\n  phishing_risk: Number.isFinite(Number(g.phishing_risk)) && g.phishing_risk !== null ? Number(g.phishing_risk) : 1,\n  attack_type: g.attack_type,\n  class: x?.force_class || g.class,\n  guard_reason: g.reason,\n  dg_score: dgScore,\n  dg_verdict: dg?.verdict || 'missing',\n  dg_signals: [(dg?.provenance?.detectedSignals || []).join(', '), pre && `pre: ${pre}`].filter(Boolean).join(' | '),\n  dg_block: base.dg_enforce !== false && !dgClean,\n} };\n",
+        "jsCode": "const src = $('Blue Bookmark').item.json;\nconst g = $input.item.json.output || {};\n// `x` holds in-flight views; it is not an audit column\nconst { dg, x, ...base } = src;\n\n// Fail closed: the email passes Blue Bookmark only if the scan returned a numeric score below 70\n// and did not report a scan error. A missing guard, a null score or verdict \"error\" all block.\nconst dgScore = typeof dg?.score === 'number' && Number.isFinite(dg.score) ? dg.score : null;\nconst dgClean = dgScore !== null && dgScore < 70 && dg?.verdict !== 'error';\nconst pre = (x?.flags || []).join(', ');\n\nreturn { json: {\n  ...base,\n  // a missing or non-numeric score is treated as maximum risk (fail-closed)\n  risk: Number.isFinite(Number(g.injection_risk)) && g.injection_risk !== null ? Number(g.injection_risk) : 1,\n  phishing_risk: Number.isFinite(Number(g.phishing_risk)) && g.phishing_risk !== null ? Number(g.phishing_risk) : 1,\n  attack_type: g.attack_type,\n  class: x?.force_class || g.class,\n  guard_reason: g.reason,\n  dg_score: dgScore,\n  dg_verdict: dg?.verdict || 'missing',\n  dg_signals: [(dg?.provenance?.detectedSignals || []).join(', '), pre && `pre: ${pre}`].filter(Boolean).join(' | '),\n  dg_block: base.dg_enforce !== false && !dgClean,\n} };\n",
         "mode": "runOnceForEachItem"
       }
     },
@@ -2733,23 +2733,26 @@
     },
     {
       "id": "d80a8875-4cc3-4aa7-a3f2-dfd639befc3a",
-      "name": "Document Guard",
-      "type": "CUSTOM.documentGuard",
+      "name": "Blue Bookmark",
+      "type": "CUSTOM.blueBookmark",
       "typeVersion": 1,
       "position": [
         1136,
         16
       ],
       "parameters": {
-        "source": "={{ ($json.body_html || $json.body_text) + '\\n\\n' + $json.attachments_text.join('\\n\\n') }}",
+        "inputType": "email",
+        "emailSubject": "={{ $json.subject }}",
+        "emailBody": "={{ $json.body_text }}",
+        "emailHtml": "={{ $json.body_html }}",
+        "emailHeaders": "={{ {} }}",
+        "emailAttachments": "={{ ($json.attachments_text || []).filter(Boolean).map((text, i) => ({ name: 'attachment_' + i, text })) }}",
+        "mode": "score",
+        "decodeBase64": true,
+        "stripHidden": false,
         "options": {
           "outputField": "dg"
-        },
-        "contentType": "auto",
-        "mode": "score",
-        "threshold": 50,
-        "decodeBase64": true,
-        "stripHidden": false
+        }
       }
     },
     {
@@ -4551,17 +4554,6 @@
         ]
       ]
     },
-    "Document Guard": {
-      "main": [
-        [
-          {
-            "node": "Guard",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Loop guard": {
       "main": [
         [
@@ -4785,7 +4777,7 @@
         ],
         [
           {
-            "node": "Document Guard",
+            "node": "Blue Bookmark",
             "type": "main",
             "index": 0
           }
@@ -5009,6 +5001,17 @@
           }
         ],
         []
+      ]
+    },
+    "Blue Bookmark": {
+      "main": [
+        [
+          {
+            "node": "Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
