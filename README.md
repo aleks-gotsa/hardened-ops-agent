@@ -74,7 +74,7 @@ On top of the public corpus, 12 hand-written attacks test tricks it does not cov
 
 New to n8n? Start with the [official n8n docs](https://docs.n8n.io/). The [setup guide](docs/SETUP.md) lists what you need and walks through every step. In short:
 
-1. Install the **Document Guard** node (a separate repository by the same author, link coming soon), then import the two workflows from [`workflow/`](workflow/) into n8n.
+1. Install the [Document Guard](https://github.com/aleks-gotsa/blue-bookmark) node (Blue Bookmark), then import the two workflows from [`workflow/`](workflow/) into n8n.
 2. Create the audit table from [`workflow/schema.sql`](workflow/schema.sql).
 3. Connect your Gmail, Telegram, GitHub and Anthropic accounts, then switch the workflows on.
 

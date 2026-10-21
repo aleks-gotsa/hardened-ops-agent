@@ -9,7 +9,7 @@ The repository holds two n8n workflows, a Postgres schema and red-team scripts. 
 ## Before you start, ask the user for
 
 - The URL of their n8n instance, and an n8n API key (*Settings → n8n API*). Never ask them to paste secrets into chat if you can read them from their environment.
-- Confirmation that the **Document Guard** node is installed (see [docs/SETUP.md](docs/SETUP.md)). Without it, the import fails with an unknown node type.
+- Confirmation that the **Document Guard** node is installed: [Blue Bookmark](https://github.com/aleks-gotsa/blue-bookmark). Without it, the import fails with an unknown node type.
 - Which Gmail inbox the agent should read, which Telegram chat should receive approval cards, and which GitHub repository tickets should go to.
 
 ## Install

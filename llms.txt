@@ -2,7 +2,7 @@
 
 > An n8n email agent for production inboxes, hardened against prompt injection. It reads incoming Gmail and does one of four things: opens a GitHub ticket, drafts a reply that a person approves in Telegram, escalates to a person, or quarantines the email. An email cannot make it send, leak or forward anything. Every decision is logged in PostgreSQL. It is red-teamed against Microsoft's LLMail-Inject corpus: 0 of 100 attacks executed, and 0 of 100 ordinary emails quarantined.
 
-Built with n8n (queue mode), Claude Haiku (guard and judge), Claude Sonnet (agent), the Document Guard static scanner node, PostgreSQL and Telegram. MIT license. The project is a workflow you import into your own n8n; it is not a hosted service.
+Built with n8n (queue mode), Claude Haiku (guard and judge), Claude Sonnet (agent), the Document Guard static scanner node ([Blue Bookmark](https://github.com/aleks-gotsa/blue-bookmark)), PostgreSQL and Telegram. MIT license. The project is a workflow you import into your own n8n; it is not a hosted service.
 
 ## Docs
 

@@ -7,7 +7,7 @@
 | [n8n](https://docs.n8n.io/hosting/) in queue mode | 2.43.7 | runs both workflows (main process plus worker) |
 | [PostgreSQL](https://www.postgresql.org/) | 16 | n8n's own data and the `agent_runs` audit table |
 | [Redis](https://redis.io/) | 7.4 | the n8n job queue |
-| Document Guard node | v1 | the static guard (checkpoint 03). A separate repository by the same author, link coming soon. Without it, n8n reports an unknown node on import. |
+| [Document Guard](https://github.com/aleks-gotsa/blue-bookmark) node (Blue Bookmark) | v1 | the static guard (checkpoint 03). Without it, n8n reports an unknown node on import. |
 | Gmail account | | the inbox the agent reads and replies from |
 | [Telegram bot](https://core.telegram.org/bots#how-do-i-create-a-bot) | | approval cards and alerts |
 | GitHub repository and token | | tickets |
